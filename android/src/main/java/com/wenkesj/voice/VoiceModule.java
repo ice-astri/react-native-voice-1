@@ -1,8 +1,10 @@
 package com.wenkesj.voice;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.RecognitionListener;
@@ -33,6 +35,7 @@ public class VoiceModule extends ReactContextBaseJavaModule implements Recogniti
 
   final ReactApplicationContext reactContext;
   private SpeechRecognizer speech = null;
+  private AudioManager audioManager = null;
   private boolean isRecognizing = false;
   private String locale = null;
 
@@ -50,10 +53,13 @@ public class VoiceModule extends ReactContextBaseJavaModule implements Recogniti
   }
 
   private void startListening(ReadableMap opts) {
+
+
     if (speech != null) {
       speech.destroy();
       speech = null;
     }
+
     speech = SpeechRecognizer.createSpeechRecognizer(this.reactContext);
     speech.setRecognitionListener(this);
 
@@ -294,6 +300,10 @@ public class VoiceModule extends ReactContextBaseJavaModule implements Recogniti
 
   @Override
   public void onReadyForSpeech(Bundle arg0) {
+    //mute Sound
+    if(audioManager == null) audioManager = (AudioManager)reactContext.getSystemService(Context.AUDIO_SERVICE);
+    audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+
     WritableMap event = Arguments.createMap();
     event.putBoolean("error", false);
     sendEvent("onSpeechStart", event);
@@ -302,6 +312,10 @@ public class VoiceModule extends ReactContextBaseJavaModule implements Recogniti
 
   @Override
   public void onResults(Bundle results) {
+    //mute Sound
+    if(audioManager == null) audioManager = (AudioManager)reactContext.getSystemService(Context.AUDIO_SERVICE);
+    audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+
     WritableArray arr = Arguments.createArray();
 
     ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
