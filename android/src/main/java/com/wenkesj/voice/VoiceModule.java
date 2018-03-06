@@ -28,6 +28,8 @@ import com.facebook.react.modules.core.PermissionListener;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.annotation.Nullable;
 
@@ -313,14 +315,13 @@ public class VoiceModule extends ReactContextBaseJavaModule implements Recogniti
   @Override
   public void onResults(Bundle results) {
     //mute Sound
-    final Handler handler = new Handler();
-    handler.postDelayed(new Runnable() {
+    new Timer().schedule(new TimerTask() {
       @Override
       public void run() {
         if(audioManager == null) audioManager = (AudioManager)reactContext.getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
       }
-    }, 1500);    
+    }, 1500);
 
     WritableArray arr = Arguments.createArray();
 
