@@ -313,8 +313,14 @@ public class VoiceModule extends ReactContextBaseJavaModule implements Recogniti
   @Override
   public void onResults(Bundle results) {
     //mute Sound
-    if(audioManager == null) audioManager = (AudioManager)reactContext.getSystemService(Context.AUDIO_SERVICE);
-    audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+    final Handler handler = new Handler();
+    handler.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        if(audioManager == null) audioManager = (AudioManager)reactContext.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+      }
+    }, 1500);    
 
     WritableArray arr = Arguments.createArray();
 
